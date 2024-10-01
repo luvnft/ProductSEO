@@ -228,11 +228,11 @@ const formatKeywordsForTable = (textArray) => {
         <h2 className="mb-6 text-lg font-light">powered by Gemini AI</h2>
 
         {/* Product Name input */}
-        <div className="mb-4 w-[70%] mx-auto">
+        <div className="mb-4 w-[75%] mx-auto">
           <label className="block font-medium mb-2">Product Name:</label>
           
           <input
-            className="input-large w-[50%] bg-gray-200 rounded-lg  shadow-sm resize-y"
+            className="input-large w-full bg-gray-200 rounded-lg  shadow-sm resize-y"
             type="text"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
