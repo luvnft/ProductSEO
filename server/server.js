@@ -2,8 +2,11 @@ const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const fetch = require('node-fetch'); // This should now work with node-fetch@2
+const fetch = require('node-fetch'); // Import node-fetch
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+global.fetch = fetch; // Make node-fetch globally available as fetch
+
 
 dotenv.config();
 
