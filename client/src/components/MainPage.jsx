@@ -9,9 +9,10 @@ function MainPage() {
   const [currentDescription, setCurrentDescription] = useState("");
   const [specifications, setSpecifications] = useState("");
   const [optimizedDescription, setOptimizedDescription] = useState("");
-  const [keywordSuggestions, setKeywordSuggestions] = useState([]); // For keyword suggestions
-  const [selectedKeywords, setSelectedKeywords] = useState(""); // For selected keywords
-  const [isLoading, setIsLoading] = useState(false);
+  const [keywordSuggestions, setKeywordSuggestions] = useState([]); // For keyword suggestions as an array
+  const [isKeywordLoading, setIsKeywordLoading] = useState(false); // Loader for keyword suggestions
+  const [isDescriptionLoading, setIsDescriptionLoading] = useState(false); // Loader for description optimization
+  const [newKeyword, setNewKeyword] = useState(""); // For adding new keywords
   const descriptionRef = useRef(null);
 
   // Function to handle fetching keyword suggestions based on user input
@@ -26,26 +27,28 @@ function MainPage() {
           "Unique Selling Points: " + uniqueSellingPoints + ". " +
           "Target Audience: " + targetAudience + ". " +
           "Current Description: " + currentDescription + ". " +
-          "Specifications: " + specifications + ".",
+          "Specifications: " + specifications + "." +
+          "Only respond with a list of keywords."
       }),
       headers: {
         "Content-Type": "application/json",
       },
     };
 
-    setIsLoading(true);
+    setIsKeywordLoading(true);
     try {
       const response = await fetch("https://product-seo-optimizer-b5addb5025ae.herokuapp.com/completions", options);
       const data = await response.json();
-      if (data.keywords) {
-        setKeywordSuggestions(data.keywords);
+      if (data.text) {
+        const keywordsArray = data.text.split('\n').map((keyword) => keyword.replace('* ', '').trim()); // Convert text to array
+        setKeywordSuggestions(keywordsArray);
       } else {
         setKeywordSuggestions([]);
       }
-      setIsLoading(false);
+      setIsKeywordLoading(false);
     } catch (error) {
       console.error("Failed to generate keyword suggestions:", error);
-      setIsLoading(false);
+      setIsKeywordLoading(false);
     }
   };
 
@@ -58,7 +61,7 @@ function MainPage() {
           "I have a product, " +
           productName +
           ", and would like to improve its SEO ranking on search engines. Can you help me rewrite the product description to be more compelling and informative, while also incorporating relevant keywords for current search trends? " +
-          "Here are the keywords to incorporate: " + selectedKeywords + ". " +
+          "Here are the keywords to incorporate: " + keywordSuggestions.join(', ') + ". " +
           "Additionally, could you suggest some backend tags that I can use to further optimize the product search? Here’s some additional information that could be helpful: " +
           "1. Product name and category: " + productName + ", " + category + ". " +
           "2. Unique Selling Points: " + uniqueSellingPoints + ". " +
@@ -71,15 +74,15 @@ function MainPage() {
       },
     };
 
-    setIsLoading(true);
+    setIsDescriptionLoading(true);
     try {
       const response = await fetch("https://product-seo-optimizer-b5addb5025ae.herokuapp.com/completions", options);
       const data = await response.json();
       setOptimizedDescription(data.text);
-      setIsLoading(false);
+      setIsDescriptionLoading(false);
     } catch (error) {
       console.error("Failed to generate product description:", error);
-      setIsLoading(false);
+      setIsDescriptionLoading(false);
     }
   };
 
@@ -95,6 +98,27 @@ function MainPage() {
     });
   };
 
+  // Function to handle adding a new keyword to the list
+  const handleAddKeyword = () => {
+    if (newKeyword.trim()) {
+      setKeywordSuggestions([...keywordSuggestions, newKeyword.trim()]);
+      setNewKeyword(""); // Reset the input
+    }
+  };
+
+  // Function to handle editing a keyword in the list
+  const handleEditKeyword = (index, newKeyword) => {
+    const updatedKeywords = [...keywordSuggestions];
+    updatedKeywords[index] = newKeyword;
+    setKeywordSuggestions(updatedKeywords);
+  };
+
+  // Function to handle deleting a keyword from the list
+  const handleDeleteKeyword = (index) => {
+    const updatedKeywords = keywordSuggestions.filter((_, i) => i !== index);
+    setKeywordSuggestions(updatedKeywords);
+  };
+
   // Function to handle copying the description to clipboard
   const handleCopyDescription = async () => {
     if (descriptionRef.current) {
@@ -106,11 +130,6 @@ function MainPage() {
         console.error("Failed to copy text to clipboard:", error);
       }
     }
-  };
-
-  // Function to handle selecting keywords
-  const handleKeywordSelection = (keyword) => {
-    setSelectedKeywords((prev) => prev ? `${prev}, ${keyword}` : keyword); // Append selected keyword
   };
 
   return (
@@ -138,20 +157,66 @@ function MainPage() {
           </button>
         </div>
 
+        {/* Keyword Loading Spinner */}
+        {isKeywordLoading && (
+          <div className="flex items-center justify-center mb-4">
+            <ThreeDots
+              type="ThreeDots"
+              color="#FF6347"
+              height={50}
+              width={50}
+            />
+            <p className="ml-2">Generating keywords...</p>
+          </div>
+        )}
+
         {/* Keyword Suggestions Section */}
         {keywordSuggestions.length > 0 && (
-          <div className="mb-4">
+          <div className="mb-4 items-center ">
             <label className="block font-medium mb-2">Suggested Keywords:</label>
-            <div className="flex flex-wrap gap-2">
-              {keywordSuggestions.map((keyword, index) => (
-                <button
-                  key={index}
-                  className="bg-gray-200 rounded-lg px-2 py-1 text-sm hover:bg-blue-500 hover:text-white"
-                  onClick={() => handleKeywordSelection(keyword)}
-                >
-                  {keyword}
-                </button>
-              ))}
+            <table className="table-auto w-3/4">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2">Keyword</th>
+                  <th className="px-4 py-2">Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {keywordSuggestions.map((keyword, index) => (
+                  <tr key={index}>
+                    <td className="border px-4 py-2">
+                      <input
+                        className="bg-gray-100 border rounded px-2 py-1"
+                        value={keyword}
+                        onChange={(e) => handleEditKeyword(index, e.target.value)}
+                      />
+                    </td>
+                    
+                    <td className="border px-4 py-2 text-center">
+                      <button className="bg-red-500 text-white rounded-full px-2 py-1" onClick={() => handleDeleteKeyword(index)}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Add New Keyword */}
+            <div className="flex mt-4">
+              <input
+                className="input-large bg-gray-200 rounded-lg shadow-sm w-1/2"
+                type="text"
+                placeholder="Add a new keyword"
+                value={newKeyword}
+                onChange={(e) => setNewKeyword(e.target.value)}
+              />
+              <button
+                className="bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-full font-medium ml-4"
+                onClick={handleAddKeyword}
+              >
+                Add Keyword
+              </button>
             </div>
           </div>
         )}
@@ -166,46 +231,83 @@ function MainPage() {
             onChange={(e) => setCategory(e.target.value)}
           />
         </div>
+ {/* Unique Selling Points input */}
 
-        {/* Unique Selling Points input */}
-        <div className="mb-4">
-          <label className="block font-medium mb-2">Unique Selling Points:</label>
-          <textarea
-            className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4"
-            value={uniqueSellingPoints}
-            onChange={(e) => setUniqueSellingPoints(e.target.value)}
-          />
-        </div>
+ <div className="mb-4">
 
-        {/* Target Audience input */}
-        <div className="mb-4">
-          <label className="block font-medium mb-2">Target Audience:</label>
-          <textarea
-            className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4"
-            value={targetAudience}
-            onChange={(e) => setTargetAudience(e.target.value)}
-          />
-        </div>
+<label className="block font-medium mb-2">Unique Selling Points:</label>
 
-        {/* Current Description input */}
-        <div className="mb-4">
-          <label className="block font-medium mb-2">Current Description:</label>
-          <textarea
-            className="input-large bg-gray-200 w-3/4 rounded-lg shadow-sm resize-y h-24"
-            value={currentDescription}
-            onChange={(e) => setCurrentDescription(e.target.value)}
-          />
-        </div>
+<textarea
 
-        {/* Specifications input */}
-        <div className="mb-4">
-          <label className="block font-medium mb-2">Specifications (size, color, material):</label>
-          <textarea
-            className="input-large bg-gray-200 w-3/4 rounded-lg shadow-sm resize-y h-24"
-            value={specifications}
-            onChange={(e) => setSpecifications(e.target.value)}
-          />
-        </div>
+  className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4"
+
+  value={uniqueSellingPoints}
+
+  onChange={(e) => setUniqueSellingPoints(e.target.value)}
+
+/>
+
+</div>
+
+
+
+{/* Target Audience input */}
+
+<div className="mb-4">
+
+<label className="block font-medium mb-2">Target Audience:</label>
+
+<textarea
+
+  className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4"
+
+  value={targetAudience}
+
+  onChange={(e) => setTargetAudience(e.target.value)}
+
+/>
+
+</div>
+
+
+
+{/* Current Description input */}
+
+<div className="mb-4">
+
+<label className="block font-medium mb-2">Current Description:</label>
+
+<textarea
+
+  className="input-large bg-gray-200 w-3/4 rounded-lg shadow-sm resize-y h-24"
+
+  value={currentDescription}
+
+  onChange={(e) => setCurrentDescription(e.target.value)}
+
+/>
+
+</div>
+
+
+
+{/* Specifications input */}
+
+<div className="mb-4">
+
+<label className="block font-medium mb-2">Specifications (size, color, material):</label>
+
+<textarea
+
+  className="input-large bg-gray-200 w-3/4 rounded-lg shadow-sm resize-y h-24"
+
+  value={specifications}
+
+  onChange={(e) => setSpecifications(e.target.value)}
+
+/>
+
+</div>
 
         {/* Optimize Button */}
         <button
@@ -214,7 +316,7 @@ function MainPage() {
         >
           Optimize Description
         </button>
-        {isLoading && (
+        {isDescriptionLoading && (
           <div className="flex items-center mt-4">
             <ThreeDots
               type="ThreeDots"
