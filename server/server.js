@@ -2,11 +2,13 @@ const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const fetch = require('node-fetch'); // Import node-fetch
+const fetch = require('node-fetch'); // Import node-fetch version 2
+const { Headers } = require('node-fetch'); // Import Headers from node-fetch
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-global.fetch = fetch; // Make node-fetch globally available as fetch
-
+// Polyfill fetch and Headers globally for Node.js
+global.fetch = fetch;
+global.Headers = Headers;
 
 dotenv.config();
 
