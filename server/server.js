@@ -2,6 +2,7 @@ const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const fetch = require('node-fetch'); // Import node-fetch
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 dotenv.config();
@@ -32,11 +33,16 @@ app.post('/completions', async (req, res) => {
       model: "gemini-pro",
       geminiConfig,
     });
+
+    // Make the request to Gemini
     const result = await geminiModel.generateContent(prompt);
-    const response = await result.response.text();
-    res.send({ text: response });
+
+    // Read the response from the API
+    const responseText = result.response.text ? await result.response.text() : "No content generated";
+    
+    res.send({ text: responseText });
   } catch (error) {
-    console.error("Response error", error);
+    console.error("Response error:", error); // Log the actual error from Gemini
     res.status(500).send({ error: 'Failed to fetch data from Gemini' });
   }
 });
