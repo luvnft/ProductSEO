@@ -138,6 +138,24 @@ function MainPage() {
           </button>
         </div>
 
+        {/* Keyword Suggestions Section */}
+        {keywordSuggestions.length > 0 && (
+          <div className="mb-4">
+            <label className="block font-medium mb-2">Suggested Keywords:</label>
+            <div className="flex flex-wrap gap-2">
+              {keywordSuggestions.map((keyword, index) => (
+                <button
+                  key={index}
+                  className="bg-gray-200 rounded-lg px-2 py-1 text-sm hover:bg-blue-500 hover:text-white"
+                  onClick={() => handleKeywordSelection(keyword)}
+                >
+                  {keyword}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Category input */}
         <div className="mb-4">
           <label className="block font-medium mb-2">Category:</label>
@@ -188,24 +206,6 @@ function MainPage() {
             onChange={(e) => setSpecifications(e.target.value)}
           />
         </div>
-
-        {/* Keyword Suggestions Section */}
-        {keywordSuggestions.length > 0 && (
-          <div className="mb-4">
-            <label className="block font-medium mb-2">Suggested Keywords:</label>
-            <div className="flex flex-wrap gap-2">
-              {keywordSuggestions.map((keyword, index) => (
-                <button
-                  key={index}
-                  className="bg-gray-200 rounded-lg px-2 py-1 text-sm hover:bg-blue-500 hover:text-white"
-                  onClick={() => handleKeywordSelection(keyword)}
-                >
-                  {keyword}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Optimize Button */}
         <button
