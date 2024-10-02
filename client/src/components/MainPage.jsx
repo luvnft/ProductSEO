@@ -97,6 +97,8 @@ const formatKeywordsForTable = (textArray) => {
   const handleGenerateDescription = async () => {
 // Combine selectedKeywords and keywordSuggestions into one array
 const combinedKeywords = [...selectedKeywords.split(', '), ...keywordSuggestions].join(', ');
+// Combine the targetAudience and targetAudienceSuggestions
+const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudienceSuggestions].join(', ');
 
     const options = {
       method: "POST",
@@ -109,7 +111,7 @@ const combinedKeywords = [...selectedKeywords.split(', '), ...keywordSuggestions
           "Additionally, could you suggest some backend tags that I can use to further optimize the product search? Here’s some additional information that could be helpful: " +
           "1. Product name and category: " + productName + ", " + category + ". " +
           "2. Unique Selling Points: " + uniqueSellingPoints + ". " +
-          "3. Target Audience: " + targetAudience + ". " +
+          "3. Target Audience: " + combinedTargetAudience + ". " +
           "4. Existing Description: " + currentDescription + ". " +
           "5. Product Specifications: " + specifications + " (inform user that specifications include size, color, material)." +
           "Please return the description with the key product features highlighted in 3-5 concise and compelling bullet points at the beginning. These bullet points should be the most important information for search engines and potential buyers. After the bullet points, please provide a more detailed description that elaborates on these features and includes additional product information. Ensure consistent capitalization at the beginning of each bullet point. Finally, please suggest some relevant backend tags that I can use to further optimize the product search.",
