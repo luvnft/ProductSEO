@@ -280,7 +280,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
           <label className="block font-medium mb-2">Product Name:</label>
           
           <input
-            className="input-large w-full bg-gray-200 rounded-lg hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text shadow-sm resize-y"
+            className="input-large w-full bg-gray-200 rounded-lg hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text  resize-y"
             type="text"
             placeholder="Enter your product name"
             value={productName}
