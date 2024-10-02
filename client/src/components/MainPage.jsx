@@ -280,7 +280,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
           <label className="block font-medium mb-2">Product Name:</label>
           
           <input
-            className="input-large w-full bg-gray-200 rounded-lg  shadow-sm resize-y"
+            className="input-large w-full bg-gray-200 rounded-lg hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text shadow-sm resize-y"
             type="text"
             placeholder="Enter your product name"
             value={productName}
@@ -295,7 +295,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
         <div className="mb-4">
           <label className="block font-medium mb-2">Product Category:</label>
           <input
-            className="input-large bg-gray-200 rounded-lg shadow-sm w-3/4 resize-y"
+            className="input-large bg-gray-200 rounded-lg shadow-sm w-3/4 resize-y  hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text"
             type="text"
             placeholder="Enter the Product Category"
             value={category}
@@ -311,7 +311,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
 
 <textarea
 
-  className="input-large bg-gray-200 w-3/4 rounded-lg shadow-sm resize-y h-24"
+  className="input-large bg-gray-200 w-3/4 rounded-lg shadow-sm resize-y h-24  hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text"
 
   value={currentDescription}
 
@@ -331,7 +331,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
 
 <textarea
 
-  className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4"
+  className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4  hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text"
 
   value={uniqueSellingPoints}
 
@@ -353,7 +353,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
 
 <textarea
 
-  className="input-large bg-gray-200 w-3/4 rounded-lg shadow-sm resize-y h-24"
+  className="input-large bg-gray-200 w-3/4 rounded-lg shadow-sm resize-y h-24  hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text"
 
   value={specifications}
 
@@ -372,7 +372,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
 <div className="mb-4">
   <label className="block font-medium mb-2">Keywords:</label>
   <textarea
-    className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4"
+    className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4  hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text"
     placeholder="Have Keywords in mind? Enter them here. (optional)"
     value={selectedKeywords} // You might want to replace this with another state variable if needed
     onChange={(e) => setSelectedKeywords(e.target.value)}
@@ -524,7 +524,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
 <div className="mb-4">
   <label className="block font-medium mb-2">Target Audience:</label>
   <textarea
-    className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4"
+    className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4  hover:border-2 hover:cursor-pointer focus:border-blue-500 focus:cursor-text"
     placeholder="Enter your target audience (optional)"
     value={targetAudience}
     onChange={(e) => setTargetAudience(e.target.value)}
