@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { ThreeDots } from 'react-loader-spinner';
+import { FaMagic, FaCopy, FaSearch } from 'react-icons/fa'; // FontAwesome icons example
 
 function MainPage() {
   const [productName, setProductName] = useState("");
@@ -19,7 +20,9 @@ function MainPage() {
   const [showAudienceSuggestions, setShowAudienceSuggestions] = useState(false); // To track if suggestions should be shown
   const [showKeywordSuggestions, setShowKeywordSuggestions] = useState(false); // To track if keyword suggestions should be shown
   const [selectedKeywords, setSelectedKeywords] = useState(''); // To store selected keywords
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [keywordToDelete, setKeywordToDelete] = useState('');
+  const [deleteIndex, setDeleteIndex] = useState(null);
 
   const descriptionRef = useRef(null);
 
@@ -92,6 +95,9 @@ const formatKeywordsForTable = (textArray) => {
 };
   // Function to handle generating the optimized product description
   const handleGenerateDescription = async () => {
+// Combine selectedKeywords and keywordSuggestions into one array
+const combinedKeywords = [...selectedKeywords.split(', '), ...keywordSuggestions].join(', ');
+
     const options = {
       method: "POST",
       body: JSON.stringify({
@@ -99,14 +105,15 @@ const formatKeywordsForTable = (textArray) => {
           "I have a product, " +
           productName +
           ", and would like to improve its SEO ranking on search engines. Can you help me rewrite the product description to be more compelling and informative, while also incorporating relevant keywords for current search trends? " +
-          "Here are the keywords to incorporate: " + keywordSuggestions.join(', ') + ". " +
+          "Here are some of the keywords to incorporate: " + combinedKeywords + ". " +
           "Additionally, could you suggest some backend tags that I can use to further optimize the product search? Here’s some additional information that could be helpful: " +
           "1. Product name and category: " + productName + ", " + category + ". " +
           "2. Unique Selling Points: " + uniqueSellingPoints + ". " +
           "3. Target Audience: " + targetAudience + ". " +
           "4. Existing Description: " + currentDescription + ". " +
-          "5. Product Specifications: " + specifications + " (inform user that specifications include size, color, material).",
-      }),
+          "5. Product Specifications: " + specifications + " (inform user that specifications include size, color, material)." +
+          "Please return the description with the key product features highlighted in 3-5 concise and compelling bullet points at the beginning. These bullet points should be the most important information for search engines and potential buyers. After the bullet points, please provide a more detailed description that elaborates on these features and includes additional product information. Ensure consistent capitalization at the beginning of each bullet point. Finally, please suggest some relevant backend tags that I can use to further optimize the product search.",
+        }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -127,14 +134,39 @@ const formatKeywordsForTable = (textArray) => {
   // Function to format the optimized description for display
   const formatDescription = (text) => {
     const lines = text.split('\n').filter(line => line.trim() !== '');
-    return lines.map((line, index) => {
-      if (line.startsWith('**') && line.endsWith('**')) {
-        return <h2 key={index} className="text-xl font-bold my-2">{line.replace(/\*\*/g, '')}</h2>;
-      } else {
-        return <p key={index} className="my-1">{line}</p>;
-      }
-    });
+  
+    return (
+      <>
+        <ul className="list-disc list-inside my-4">
+          {lines.map((line, index) => {
+            // Check if the line starts with a bullet point and contains bold text
+            if (line.startsWith('- **') && line.includes('**')) {
+              const content = line
+                .replace(/-\s\*\*(.*?)\*\*/, (match, p1) => `**${p1.toUpperCase()}**`) // Capitalize the header
+                .replace(/\*\*/g, ''); // Remove the asterisks from the rest of the line
+              return <li key={index} className="my-1 font-medium">{content}</li>;
+            }
+  
+            // Check if the line starts and ends with ** for headings
+            if (line.startsWith('**') && line.endsWith('**')) {
+              const headingContent = line.replace(/\*\*/g, ''); // Remove the asterisks
+              return <h2 key={index} className="text-2xl font-bold mt-4 mb-2">{headingContent}</h2>;
+            }
+  
+            // Check for more detailed headers or sections
+            if (line.startsWith('More Information:')) {
+              return <h3 key={index} className="text-lg font-semibold mt-4">{line}</h3>;
+            } else if (line.startsWith('Backend Tags:')) {
+              return <h3 key={index} className="text-lg font-semibold mt-4">{line}</h3>;
+            } else {
+              return <p key={index} className="my-1">{line}</p>;
+            }
+          })}
+        </ul>
+      </>
+    );
   };
+  
 
   // Function to handle adding a new keyword to the list
   const handleAddKeyword = () => {
@@ -151,10 +183,24 @@ const formatKeywordsForTable = (textArray) => {
     setKeywordSuggestions(updatedKeywords);
   };
 
+   // Function to open the delete confirmation modal
+   const handleOpenDeleteModal = (index, keyword) => {
+    setKeywordToDelete(keyword); // Store the keyword to be deleted
+    setDeleteIndex(index);       // Store the index of the keyword
+    setShowDeleteModal(true);    // Show the modal
+  };
+
   // Function to handle deleting a keyword from the list
-  const handleDeleteKeyword = (index) => {
-    const updatedKeywords = keywordSuggestions.filter((_, i) => i !== index);
+  const handleDeleteKeyword = () => {
+    const updatedKeywords = keywordSuggestions.filter((_, i) => i !== deleteIndex);
     setKeywordSuggestions(updatedKeywords);
+    setShowDeleteModal(false);  // Close the modal after deletion
+  };
+  
+
+  // Function to cancel deletion and close the modal
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);  // Close the modal without deleting
   };
 
   // Function to handle copying the description to clipboard
@@ -223,7 +269,7 @@ const formatKeywordsForTable = (textArray) => {
       <div className="bg-white border-gray-500 max-w-5xl p-8 rounded-xl shadow-xl w-[80%]">
         <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-center">
-          ⭐ Product Listing Optimizer ⭐
+        <FaMagic className="inline-block mr-2" /> Product Listing Optimizer <FaMagic className="inline-block ml-2" />
         </h1>
         <h2 className="mb-6 text-lg font-light">powered by Gemini AI</h2>
 
@@ -241,6 +287,78 @@ const formatKeywordsForTable = (textArray) => {
           
         </div>
 
+
+        {/* Category input */}
+        <div className="mb-4">
+          <label className="block font-medium mb-2">Product Category:</label>
+          <input
+            className="input-large bg-gray-200 rounded-lg shadow-sm w-3/4 resize-y"
+            type="text"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          />
+        </div>
+
+{/* Current Description input */}
+
+<div className="mb-4">
+
+<label className="block font-medium mb-2">Current Description:</label>
+
+<textarea
+
+  className="input-large bg-gray-200 w-3/4 rounded-lg shadow-sm resize-y h-24"
+
+  value={currentDescription}
+
+  onChange={(e) => setCurrentDescription(e.target.value)}
+
+/>
+
+</div>
+
+
+ {/* Unique Selling Points input */}
+
+ <div className="mb-4">
+
+<label className="block font-medium mb-2">Unique Selling Points:</label>
+
+<textarea
+
+  className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4"
+
+  value={uniqueSellingPoints}
+
+  onChange={(e) => setUniqueSellingPoints(e.target.value)}
+
+/>
+
+</div>
+
+
+
+{/* Specifications input */}
+
+<div className="mb-4">
+
+<label className="block font-medium mb-2">Specifications (size, color, material):</label>
+
+<textarea
+
+  className="input-large bg-gray-200 w-3/4 rounded-lg shadow-sm resize-y h-24"
+
+  value={specifications}
+
+  onChange={(e) => setSpecifications(e.target.value)}
+
+/>
+
+</div>
+
+
+
+
 {/* Keyword input */}
 <div className="mb-4">
   <label className="block font-medium mb-2">Keywords:</label>
@@ -249,7 +367,7 @@ const formatKeywordsForTable = (textArray) => {
     value={selectedKeywords} // You might want to replace this with another state variable if needed
     onChange={(e) => setSelectedKeywords(e.target.value)}
   />
-  <p className="font-light"> 🚀 Need keyword suggestions? 
+  <p className="font-light">🚀 Need keyword suggestions? 
     <br/>Fill out the rest of the form and 
     <a
       className="text-blue-500 font-medium cursor-pointer underline ml-2"
@@ -322,104 +440,75 @@ const formatKeywordsForTable = (textArray) => {
                       Edit
                     </button>
                   </td> */}
-                  <td className="border  px-4 py-2 text-center">
-                  <button
-  className="bg-red-500 text-white rounded-full mx-auto px-4 py-2 transition-transform transform hover:scale-105 hover:bg-red-600 shadow-md flex items-center"
-  onClick={() => handleDeleteKeyword(index)}
->
-  <svg
-    className="w-4 h-4 mr-2"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-  </svg>
-  Delete
-</button>
-
-                  </td>
+                  <td className="border px-4 py-2 text-center">
+                <button
+                  className="bg-red-500 text-white rounded-full mx-auto px-4 py-2 transition-transform transform hover:scale-105 hover:bg-red-600 shadow-md flex items-center"
+                  onClick={() => handleOpenDeleteModal(index, keyword)}
+                >
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                  Delete
+                </button>
+              </td>
                 </tr>
               ))}
             </tbody>
           </table>
          {/* Add New Keyword */}
-<div className="w-[70%] mx-auto grid grid-cols-4 gap-4 mt-4">
+<div className="w-[70%] mx-auto grid grid-cols-3 gap-4 mt-4">
   <input
-    className="col-span-3  rounded-lg shadow-sm w-full bg-gray-100 border-gray-300 border  mx-auto   px-2 py-1"
+    className="col-span-2  rounded-lg shadow-sm w-full bg-gray-100 border-gray-300 border  mx-auto   px-2 py-1"
     type="text"
     placeholder="Add a new keyword"
     value={newKeyword}
     onChange={(e) => setNewKeyword(e.target.value)}
   />
   <button
-    className="col-span-1 bg-blue-500 text-white hover:bg-blue-600 py-2 px-4  w-full rounded-full font-medium"
+    className="col-span-1 bg-blue-500 text-white hover:bg-blue-600 py-2 px-16 md:px-16  flex items-center justify-center  w-full rounded-full font-medium"
     onClick={handleAddKeyword}
   >
     Add Keyword
   </button>
 </div>
-
+{/* Delete Confirmation Modal */}
+{showDeleteModal && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h2 className="text-xl font-semibold mb-4">Are you sure?</h2>
+            <p className="mb-6">Do you really want to delete the keyword: <strong>{keywordToDelete}</strong>?</p>
+            
+            <div className="flex justify-between">
+              <button
+                className="bg-red-500 text-white py-2 px-4 rounded-full font-medium hover:bg-red-600"
+                onClick={handleDeleteKeyword}
+              >
+                Delete
+              </button>
+              <button
+                className="bg-gray-300 text-gray-700 py-2 px-4 rounded-full font-medium hover:bg-gray-400"
+                onClick={handleCancelDelete}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
+        </div>
+      )}
+      
 </div>
 </div>
 )}
 
-        {/* Category input */}
-        <div className="mb-4">
-          <label className="block font-medium mb-2">Product Category:</label>
-          <input
-            className="input-large bg-gray-200 rounded-lg shadow-sm w-3/4 resize-y"
-            type="text"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          />
-        </div>
-
- {/* Unique Selling Points input */}
-
- <div className="mb-4">
-
-<label className="block font-medium mb-2">Unique Selling Points:</label>
-
-<textarea
-
-  className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4"
-
-  value={uniqueSellingPoints}
-
-  onChange={(e) => setUniqueSellingPoints(e.target.value)}
-
-/>
-
-</div>
-
-
-
-
-
-
-
-{/* Current Description input */}
-
-<div className="mb-4">
-
-<label className="block font-medium mb-2">Current Description:</label>
-
-<textarea
-
-  className="input-large bg-gray-200 w-3/4 rounded-lg shadow-sm resize-y h-24"
-
-  value={currentDescription}
-
-  onChange={(e) => setCurrentDescription(e.target.value)}
-
-/>
-
-</div>
 
 {/* Target Audience input */}
 <div className="mb-4">
@@ -429,7 +518,7 @@ const formatKeywordsForTable = (textArray) => {
     value={targetAudience}
     onChange={(e) => setTargetAudience(e.target.value)}
   />
-  <p>Need suggestions on an audience to target? 
+  <p className="font-light">  <FaSearch className="inline-block mr-2" />Need suggestions on an audience to target? 
   <a
     className="text-blue-500 font-medium cursor-pointer underline ml-2"
     onClick={handleSuggestTargetAudience}
@@ -459,31 +548,16 @@ const formatKeywordsForTable = (textArray) => {
 )}
 
 
-{/* Specifications input */}
 
-<div className="mb-4">
-
-<label className="block font-medium mb-2">Specifications (size, color, material):</label>
-
-<textarea
-
-  className="input-large bg-gray-200 w-3/4 rounded-lg shadow-sm resize-y h-24"
-
-  value={specifications}
-
-  onChange={(e) => setSpecifications(e.target.value)}
-
-/>
-
-</div>
-
+<div className="py-4">
         {/* Optimize Button */}
         <button
-          className="bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-full font-medium text-center w-3/4"
+          className="bg-blue-500 text-white hover:bg-blue-600 py-4 px-4 rounded-full font-medium text-center w-3/4"
           onClick={handleGenerateDescription}
         >
-          Optimize Description
+          Optimize Product Listing
         </button>
+        </div>
         {isDescriptionLoading && (
           <div className="flex items-center mt-4">
             <ThreeDots
@@ -507,12 +581,14 @@ const formatKeywordsForTable = (textArray) => {
                 {formatDescription(optimizedDescription)}
               </div>
               <div className="absolute bottom-2 right-2">
-                <button
-                  className="bg-green-500 text-white hover:bg-green-600 py-2 px-6 rounded-full font-medium"
-                  onClick={handleCopyDescription}
-                >
+              <button 
+              className="bg-green-500 text-white hover:bg-green-600 py-2 px-6 rounded-full font-medium flex items-center"
+              onClick={handleCopyDescription}
+              >
+                  <FaCopy className="mr-2" /> 
                   Copy
                 </button>
+
               </div>
             </div>
           </div>
