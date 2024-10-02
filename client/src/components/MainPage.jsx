@@ -373,7 +373,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
   <label className="block font-medium mb-2">Keywords:</label>
   <textarea
     className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4"
-    placeholder="Have Keywords in mind? Enter them here."
+    placeholder="Have Keywords in mind? Enter them here. (optional)"
     value={selectedKeywords} // You might want to replace this with another state variable if needed
     onChange={(e) => setSelectedKeywords(e.target.value)}
   />
