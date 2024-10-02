@@ -223,7 +223,7 @@ const formatKeywordsForTable = (textArray) => {
       <div className="bg-white border-gray-500 max-w-5xl p-8 rounded-xl shadow-xl w-[80%]">
         <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-center">
-          ⭐ Product Description Optimizer ⭐
+          ⭐ Product Listing Optimizer ⭐
         </h1>
         <h2 className="mb-6 text-lg font-light">powered by Gemini AI</h2>
 
@@ -238,12 +238,7 @@ const formatKeywordsForTable = (textArray) => {
             onChange={(e) => setProductName(e.target.value)}
           />
        
-          {/* <button
-            className="bg-blue-500 text-white hover:bg-blue-600 py-1 px-4  rounded-full font-medium ml-4"
-            onClick={handleGenerateKeywordSuggestions}
-          >
-            Generate Keyword Suggestions
-          </button> */}
+          
         </div>
 
 {/* Keyword input */}
@@ -503,9 +498,10 @@ const formatKeywordsForTable = (textArray) => {
         )}
 
         {/* Optimized Description Section */}
-        <h2 className="text-2xl font-semibold mt-6">Optimized Product Description:</h2>
         <div className="h-full flex flex-col justify-center items-center">
           <div className="border p-4 mt-2 rounded-xl shadow-xl w-3/4 flex flex-col justify-center items-center relative">
+          <h2 className="text-2xl font-semibold mt-6">Optimized Product Listing:</h2>
+
             <div className="h-full flex flex-col overflow-y-auto justify-center items-center">
               <div className="flex-grow p-8" ref={descriptionRef}>
                 {formatDescription(optimizedDescription)}
