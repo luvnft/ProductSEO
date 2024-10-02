@@ -282,6 +282,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
           <input
             className="input-large w-full bg-gray-200 rounded-lg  shadow-sm resize-y"
             type="text"
+            placeholder="Enter your product name"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
           />
@@ -296,6 +297,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
           <input
             className="input-large bg-gray-200 rounded-lg shadow-sm w-3/4 resize-y"
             type="text"
+            placeholder="Enter the Product Category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           />
@@ -314,6 +316,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
   value={currentDescription}
 
   onChange={(e) => setCurrentDescription(e.target.value)}
+  placeholder='Copy and Paste the Current Product Listing. If N/A, skip this step.'
 
 />
 
@@ -333,6 +336,8 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
   value={uniqueSellingPoints}
 
   onChange={(e) => setUniqueSellingPoints(e.target.value)}
+
+  placeholder="Enter Unique Selling points here (optional)"
 
 />
 
@@ -354,6 +359,8 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
 
   onChange={(e) => setSpecifications(e.target.value)}
 
+  placeholder="Enter Product Specifications"
+
 />
 
 </div>
@@ -366,6 +373,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
   <label className="block font-medium mb-2">Keywords:</label>
   <textarea
     className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4"
+    placeholder="Have Keywords in mind? Enter them here."
     value={selectedKeywords} // You might want to replace this with another state variable if needed
     onChange={(e) => setSelectedKeywords(e.target.value)}
   />
@@ -517,6 +525,7 @@ const combinedTargetAudience = [...targetAudience.split(', '), ...targetAudience
   <label className="block font-medium mb-2">Target Audience:</label>
   <textarea
     className="input-large bg-gray-200 rounded-lg shadow-sm resize-y h-24 w-3/4"
+    placeholder="Enter your target audience (optional)"
     value={targetAudience}
     onChange={(e) => setTargetAudience(e.target.value)}
   />
